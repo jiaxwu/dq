@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/Shopify/sarama"
-	"github.com/jiaxwu/dq/kafka_delay_queue_test"
+	"github.com/jiaxwu/dq/kafka_delay_queue_example"
 	"log"
 	"sync"
 	"time"
@@ -12,7 +12,7 @@ import (
 func main() {
 	consumerConfig := sarama.NewConfig()
 	consumerGroup, err := sarama.NewConsumerGroup(
-		kafka_delay_queue_test.Addrs, kafka_delay_queue_test.DelayGroup, consumerConfig)
+		kafka_delay_queue_example.Addrs, kafka_delay_queue_example.DelayGroup, consumerConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,7 +21,7 @@ func main() {
 	producerConfig := sarama.NewConfig()
 	producerConfig.Producer.Return.Successes = true
 	producerConfig.Producer.RequiredAcks = sarama.WaitForAll
-	producer, err := sarama.NewSyncProducer(kafka_delay_queue_test.Addrs, producerConfig)
+	producer, err := sarama.NewSyncProducer(kafka_delay_queue_example.Addrs, producerConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,10 +31,9 @@ func main() {
 	wg.Add(1)
 	consumer := NewConsumer(producer, time.Second*10)
 	go func() {
-		var err error
 		for {
-			if err = consumerGroup.Consume(context.Background(),
-				[]string{kafka_delay_queue_test.DelayTopic}, consumer); err != nil {
+			if err := consumerGroup.Consume(context.Background(),
+				[]string{kafka_delay_queue_example.DelayTopic}, consumer); err != nil {
 				break
 			}
 		}
@@ -61,7 +60,7 @@ func (c *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim saram
 		now := time.Now()
 		if now.Sub(message.Timestamp) >= c.delay {
 			_, _, err := c.producer.SendMessage(&sarama.ProducerMessage{
-				Topic: kafka_delay_queue_test.RealTopic,
+				Topic: kafka_delay_queue_example.RealTopic,
 				Key:   sarama.ByteEncoder(message.Key),
 				Value: sarama.ByteEncoder(message.Value),
 			})

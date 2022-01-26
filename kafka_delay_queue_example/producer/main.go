@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Shopify/sarama"
-	"github.com/jiaxwu/dq/kafka_delay_queue_test"
+	"github.com/jiaxwu/dq/kafka_delay_queue_example"
 	"log"
 	"strconv"
 	"time"
@@ -12,14 +12,14 @@ func main() {
 	producerConfig := sarama.NewConfig()
 	producerConfig.Producer.Return.Successes = true
 	producerConfig.Producer.RequiredAcks = sarama.WaitForAll
-	producer, err := sarama.NewSyncProducer(kafka_delay_queue_test.Addrs, producerConfig)
+	producer, err := sarama.NewSyncProducer(kafka_delay_queue_example.Addrs, producerConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer producer.Close()
 	for i := 0; i < 10; i++ {
 		msg := &sarama.ProducerMessage{
-			Topic:     kafka_delay_queue_test.DelayTopic,
+			Topic:     kafka_delay_queue_example.DelayTopic,
 			Value:     sarama.ByteEncoder("test" + strconv.Itoa(i)),
 			Timestamp: time.Now(),
 		}

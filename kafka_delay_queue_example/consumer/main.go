@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 	"github.com/Shopify/sarama"
-	"github.com/jiaxwu/dq/kafka_delay_queue_test"
+	"github.com/jiaxwu/dq/kafka_delay_queue_example"
 	"log"
 	"sync"
 )
 
 func main() {
 	consumerConfig := sarama.NewConfig()
-	consumerGroup, err := sarama.NewConsumerGroup(kafka_delay_queue_test.Addrs,
-		kafka_delay_queue_test.RealGroup, consumerConfig)
+	consumerGroup, err := sarama.NewConsumerGroup(kafka_delay_queue_example.Addrs,
+		kafka_delay_queue_example.RealGroup, consumerConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,10 +21,9 @@ func main() {
 	wg.Add(1)
 	consumer := NewConsumer()
 	go func() {
-		var err error
 		for {
-			if err = consumerGroup.Consume(context.Background(),
-				[]string{kafka_delay_queue_test.RealTopic}, consumer); err != nil {
+			if err := consumerGroup.Consume(context.Background(),
+				[]string{kafka_delay_queue_example.RealTopic}, consumer); err != nil {
 				break
 			}
 		}
