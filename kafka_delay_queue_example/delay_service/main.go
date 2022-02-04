@@ -11,6 +11,10 @@ import (
 
 func main() {
 	consumerConfig := sarama.NewConfig()
+	consumerConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
+	consumerConfig.Consumer.Offsets.Retry.Max = 3
+	consumerConfig.Consumer.Offsets.AutoCommit.Enable = true
+	consumerConfig.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
 	consumerGroup, err := sarama.NewConsumerGroup(
 		kafka_delay_queue_example.Addrs, kafka_delay_queue_example.DelayGroup, consumerConfig)
 	if err != nil {
@@ -66,8 +70,9 @@ func (c *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim saram
 			})
 			if err == nil {
 				session.MarkMessage(message, "")
+				continue
 			}
-			continue
+			return nil
 		}
 		// 否则休眠一秒
 		time.Sleep(time.Second)

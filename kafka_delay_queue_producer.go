@@ -70,8 +70,9 @@ func (c *DelayServiceConsumer) ConsumeClaim(session sarama.ConsumerGroupSession,
 			})
 			if err == nil {
 				session.MarkMessage(message, "")
+				continue
 			}
-			continue
+			return nil
 		}
 		// 否则休眠一秒
 		time.Sleep(time.Second)
